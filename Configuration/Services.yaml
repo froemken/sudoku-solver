@@ -1,0 +1,23 @@
+services:
+  _defaults:
+    autowire: false
+    autoconfigure: false
+    public: false
+
+  StefanFroemken\SudokuSolver\:
+    resource: '../Classes/*'
+
+  StefanFroemken\SudokuSolver\Domain\Factory\SudokuFactory:
+    autowire: true
+    autoconfigure: true
+    public: true
+
+  StefanFroemken\SudokuSolver\Solver\SimpleSudokuSolver:
+    autowire: true
+    autoconfigure: true
+    public: true
+
+  StefanFroemken\SudokuSolver\UserFunc\CallSudoku:
+    autowire: true
+    autoconfigure: true
+    public: true
