@@ -3,7 +3,6 @@
 	"description": "Sudoku Solver",
 	"homepage": "https://www.typo3lexikon.de/",
 	"license": ["GPL-2.0-or-later"],
-	"version": "1.0.0",
 	"authors": [
 		{
 			"name": "Stefan Froemken",
