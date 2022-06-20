@@ -36,11 +36,11 @@ class SudokuFactory
     {
         $sudoku = new Sudoku();
 
-        foreach ($structure as $posHorizontal => $row) {
-            foreach ($row as $posVertical => $value) {
+        foreach ($structure['rows'] as $posHorizontal => $row) {
+            foreach ($row['cells'] as $posVertical => $cell) {
                 $sudoku->addCell(
                     new Cell(
-                        (int)$value,
+                        (int)$cell['value'],
                         (int)$posHorizontal,
                         (int)$posVertical,
                         $this->getGridPosition($posHorizontal, $posVertical)
@@ -48,7 +48,7 @@ class SudokuFactory
                 );
             }
         }
-        DebugUtility::debug($sudoku, 'Sudoku');
+
         return $sudoku;
     }
 
