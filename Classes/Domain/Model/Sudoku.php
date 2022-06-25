@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace StefanFroemken\SudokuSolver\Domain\Model;
 
 use StefanFroemken\SudokuSolver\Domain\Exception\AlreadySolvedException;
+use StefanFroemken\SudokuSolver\Solver\CrossReferenceSolver;
 use StefanFroemken\SudokuSolver\Solver\SimpleSudokuSolver;
 use StefanFroemken\SudokuSolver\Solver\SolverInterface;
 
@@ -23,10 +24,23 @@ class Sudoku
     private array $cells = [];
 
     /**
+     * @var array
+     */
+    private array $positions = [
+        'top' => [0, 1, 2],
+        'middle' => [3, 4, 5],
+        'bottom' => [6, 7, 8],
+        'left' => [0, 3, 6],
+        'center' => [1, 4, 7],
+        'right' => [2, 5, 8],
+    ];
+
+    /**
      * @var SolverInterface[]
      */
     private array $solverClassNames = [
-        SimpleSudokuSolver::class
+        SimpleSudokuSolver::class,
+        //CrossReferenceSolver::class
     ];
 
     public function solve(): array
@@ -75,7 +89,7 @@ class Sudoku
     {
         return new Row(array_filter($this->cells, static function (Cell $cell) use ($position): bool {
             return $cell->getPosHorizontal() === $position;
-        }));
+        }), $position);
     }
 
     /*
@@ -85,7 +99,7 @@ class Sudoku
     {
         return new Column(array_filter($this->cells, static function (Cell $cell) use ($position): bool {
             return $cell->getPosVertical() === $position;
-        }));
+        }), $position);
     }
 
     /*
@@ -95,7 +109,7 @@ class Sudoku
     {
         return new Grid(array_filter($this->cells, static function (Cell $cell) use ($position): bool {
             return $cell->getGridPosition() === $position;
-        }));
+        }), $position);
     }
 
     /*
@@ -115,5 +129,21 @@ class Sudoku
         });
 
         return current($cells);
+    }
+
+    /**
+     * Returns 3 grids in a row or column.
+     * Use "top", "middle", "bottom", "left", "center", "right" as keyword
+     *
+     * @return Grid[]
+     */
+    public function getGrids(string $position): array
+    {
+        $grids = [];
+        foreach ($this->positions[$position] as $gridPosition) {
+            $grids[$gridPosition] = $this->getGrid($gridPosition);
+        }
+
+        return $grids;
     }
 }

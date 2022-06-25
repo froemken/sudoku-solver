@@ -21,14 +21,41 @@ abstract class AbstractCellCollection
      */
     private array $cells;
 
-    public function __construct(array $cells)
+    private int $position;
+
+    public function __construct(array $cells, int $position)
     {
         $this->cells = $cells;
+        $this->position = $position;
+    }
+
+    /**
+     * @return Cell[]
+     */
+    public function getCells(): array
+    {
+        return $this->cells;
+    }
+
+    public function getCellWithValue(int $value): ?Cell
+    {
+        foreach ($this->cells as $cell) {
+            if ($cell->getValue() === $value) {
+                return $cell;
+            }
+        }
+
+        return null;
     }
 
     public function setCell(int $position, Cell $cell): void
     {
         $this->cells[$position] = $cell;
+    }
+
+    public function getPosition(): int
+    {
+        return $this->position;
     }
 
     public function updateCell(int $position, int $value): void
