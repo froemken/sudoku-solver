@@ -12,6 +12,8 @@ declare(strict_types=1);
 namespace StefanFroemken\SudokuSolver\Solver;
 
 use StefanFroemken\SudokuSolver\Domain\Model\Cell;
+use StefanFroemken\SudokuSolver\Domain\Model\Grid;
+use StefanFroemken\SudokuSolver\Domain\Model\GridCollection;
 use StefanFroemken\SudokuSolver\Domain\Model\Sudoku;
 
 class CrossReferenceSolver implements SolverInterface
@@ -21,32 +23,45 @@ class CrossReferenceSolver implements SolverInterface
     public function nextSolution(Sudoku $sudoku): ?Cell
     {
         $this->sudoku = $sudoku;
+        $cell = null;
 
-        $grids = $this->sudoku->getGrids('top');
-
-        for ($value = 1; $value <= 9; $value++) {
-            foreach ($grids as $grid) {
-                if (!$grid->hasValue($value)) {
-                    continue;
-                }
+        foreach (['top', 'middle', 'bottom'] as $position) {
+            $cell = $this->getPossibleCell($this->sudoku->getGrids($position), 'horizontal');
+            if ($cell instanceof Cell) {
+                break;
             }
-            $gridSiblings = $this->getGridSiblings($grids, $grid->getPosition());
-            $posHorizontal = $grid->getCellWithValue($value)->getPosHorizontal();
-            foreach ($gridSiblings as $gridSibling) {
-                $gridSibling->getGridRow();
+        }
+
+        foreach (['left', 'center', 'right'] as $position) {
+            $cell = $this->getPossibleCell($this->sudoku->getGrids($position), 'vertical');
+            if ($cell instanceof Cell) {
+                break;
+            }
+        }
+
+        return $cell;
+    }
+
+    /**
+     * @param GridCollection $gridCollection
+     * @param string $direction
+     * @return Cell|null
+     */
+    protected function getPossibleCell(GridCollection $gridCollection, string $direction): ?Cell
+    {
+        for ($value = 1; $value <= 9; $value++) {
+            $possibleSections = $gridCollection->getPossibleSections($value, $direction);
+            if (count($possibleSections) === 1) {
+                $possibleSection = $possibleSections[0];
+                $cell = $possibleSection->getEmptyCell();
+                if ($cell instanceof Cell) {
+                    $cell->setValue($value);
+
+                    return $cell;
+                }
             }
         }
 
         return null;
-    }
-
-    /**
-     * @return Grid[]
-     */
-    private function getGridSiblings(array $grids, int $gridPosition): array
-    {
-        unset($grids[$gridPosition]);
-
-        return $grids;
     }
 }

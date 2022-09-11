@@ -16,11 +16,28 @@ namespace StefanFroemken\SudokuSolver\Domain\Model;
  */
 class GridRow extends AbstractCellCollection
 {
+    /**
+     * @var int
+     */
+    protected $gridPosition = 0;
+
+    public function __construct(array $cells, int $gridPosition, int $horizontalPosition)
+    {
+        parent::__construct($cells, $horizontalPosition);
+
+        $this->gridPosition = $gridPosition;
+    }
+
     /*
      * Returns, if all cells in grid row are filled
      */
     public function isFull(): bool
     {
         $this->getPossibleValues() === [];
+    }
+
+    public function getGridPosition(): int
+    {
+        return $this->gridPosition;
     }
 }

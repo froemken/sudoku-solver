@@ -40,7 +40,7 @@ class Sudoku
      */
     private array $solverClassNames = [
         SimpleSudokuSolver::class,
-        //CrossReferenceSolver::class
+        CrossReferenceSolver::class
     ];
 
     public function solve(): array
@@ -83,7 +83,7 @@ class Sudoku
     }
 
     /*
-     * Return all cells contained in a row
+     * Return all cells contained in a row as Row object
      */
     public function getRow(int $position): Row
     {
@@ -93,7 +93,7 @@ class Sudoku
     }
 
     /*
-     * Return all cells contained in a column
+     * Return all cells contained in a column as Column object
      */
     public function getColumn(int $position): Column
     {
@@ -103,13 +103,13 @@ class Sudoku
     }
 
     /*
-     * Return all cells contained in a grid (3x3)
+     * Return all cells contained in a grid (3x3) as Grid object
      */
-    public function getGrid(int $position): Grid
+    public function getGrid(int $gridPosition): Grid
     {
-        return new Grid(array_filter($this->cells, static function (Cell $cell) use ($position): bool {
-            return $cell->getGridPosition() === $position;
-        }), $position);
+        return new Grid(array_filter($this->cells, static function (Cell $cell) use ($gridPosition): bool {
+            return $cell->getGridPosition() === $gridPosition;
+        }), $gridPosition);
     }
 
     /*
@@ -134,16 +134,14 @@ class Sudoku
     /**
      * Returns 3 grids in a row or column.
      * Use "top", "middle", "bottom", "left", "center", "right" as keyword
-     *
-     * @return Grid[]
      */
-    public function getGrids(string $position): array
+    public function getGrids(string $position): GridCollection
     {
-        $grids = [];
+        $gridCollection = new GridCollection();
         foreach ($this->positions[$position] as $gridPosition) {
-            $grids[$gridPosition] = $this->getGrid($gridPosition);
+            $gridCollection->addGrid($this->getGrid($gridPosition));
         }
 
-        return $grids;
+        return $gridCollection;
     }
 }

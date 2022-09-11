@@ -16,17 +16,84 @@ namespace StefanFroemken\SudokuSolver\Domain\Model;
  */
 class Grid extends AbstractCellCollection
 {
-    public function getGridRow(int $position): GridRow
+    /**
+     * @return GridRow[]
+     */
+    public function getGridRows(): array
     {
-        return new GridRow(array_filter($this->getCells(), static function (Cell $cell) use ($position): bool {
-            return $cell->getPosHorizontal() === $position;
-        }), $position);
+        $gridRows = [];
+        foreach ($this->getHorizontalPositions() as $horizontalPosition) {
+            $gridRows[] = $this->getGridRow($horizontalPosition);
+        }
+
+        return $gridRows;
     }
 
-    public function getGridColumn(int $position): GridRow
+    /**
+     * @return GridColumn[]
+     */
+    public function getGridColumns(): array
     {
-        return new GridRow(array_filter($this->getCells(), static function (Cell $cell) use ($position): bool {
-            return $cell->getPosVertical() === $position;
-        }), $position);
+        $gridColumns = [];
+        foreach ($this->getVerticalPositions() as $verticalPosition) {
+            $gridColumns[] = $this->getGridColumn($verticalPosition);
+        }
+
+        return $gridColumns;
+    }
+
+    public function getGridRow(int $horizontalPosition): ?GridRow
+    {
+        $cells = array_filter($this->getCells(), static function (Cell $cell) use ($horizontalPosition): bool {
+            return $cell->getPosHorizontal() === $horizontalPosition;
+        });
+
+        if ($cells !== []) {
+            return new GridRow($cells, $this->getGridPosition(), $horizontalPosition);
+        }
+
+        return null;
+    }
+
+    public function getGridColumn(int $verticalPosition): ?GridColumn
+    {
+        $cells = array_filter($this->getCells(), static function (Cell $cell) use ($verticalPosition): bool {
+            return $cell->getPosVertical() === $verticalPosition;
+        });
+
+        if ($cells !== []) {
+            return new GridColumn($cells, $this->getGridPosition(), $verticalPosition);
+        }
+
+        return null;
+    }
+
+    public function getGridPosition(): int
+    {
+        return $this->getPosition();
+    }
+
+    protected function getVerticalPositions(): array
+    {
+        $verticalPositions = [];
+        foreach ($this->getCells() as $cell) {
+            if (!in_array($cell->getPosVertical(), $verticalPositions, true)) {
+                $verticalPositions[] = $cell->getPosVertical();
+            }
+        }
+
+        return $verticalPositions;
+    }
+
+    protected function getHorizontalPositions(): array
+    {
+        $horizontalPositions = [];
+        foreach ($this->getCells() as $cell) {
+            if (!in_array($cell->getPosHorizontal(), $horizontalPositions, true)) {
+                $horizontalPositions[] = $cell->getPosHorizontal();
+            }
+        }
+
+        return $horizontalPositions;
     }
 }
